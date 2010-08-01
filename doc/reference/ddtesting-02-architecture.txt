@@ -1,0 +1,150 @@
+DDT Reference Documentation
+Section 2: DDT's Architecture
+
+This chapter will introduce you to the way DDT is built.
+
+* A matrix of values
+
+The core abstraction DDT uses is a matrix of data cells, each accessible by column and row names. If this sounds suspiciously like a spreadsheet: That's where it comes from. 
+
++-----+------+------+
+|     | narf | zorg |
++-----+------+------+
+| foo |  A   |  B   |
++-----+------+------+
+| bar |  C   |  D   |
++-----+------+------+
+| baz |  E   |  F   |
++-----+------+------+
+
+Unlike the spreadsheet, though, DDT never uses integer indices (except internally in the Excel file reader). So in the above example cell A is addressed by (narf, foo), and cell D by (zorg, bar).
+
+Each cell can contain one value of an arbitrary type. Additionally each cell can have an arbitrary number of annotations, which are simple key-value string pairs.
+
+* The core: ObjectMatrix and StringMatrix
+
+All this is defined by the ObjectMatrix interface. This interface offers a number of accessor methods to get values of the common types - numbers, dates, strings, booleans - and the accompanying annotations, which are represented as java.util.Properties.
+
+How these values and annotations are read and parsed is implementation-dependent. You could easily provide your own implementation of ObjectMatrix to read some kind of esoteric file format, read from a database or any other kind of data source.
+
+DDT provides one implementation of this interface called DelegatingObjectMatrix. This class defines all of ObjectMatrix' operations on top of a simpler object of type StringMatrix.
+
+StringMatrix is essentially the same as an ObjectMatrix, but it only returns string values. DelegatingObjectMatrix then uses Transformers (see later section) to coerce these strings into the desired typed values. This approach has the advantage that only a very simple StringMatrix has to be implemented in order to read from various sources such as Excel files, CSV files or Properties files. All the interesting stuff is already done in DelegatingObjectMatrix.
+
+If the string returned by the underlying StringMatrix is null or blank (i.e. empty or whitespace only) all of DelegatingObjectMatrix' accessor methods will return null as the value for this cell. For historical reasons, only getString() will return an empty string in this case. If you need the string to be null, or want to make the nulling of another type more explicit, use the null /annotation/ (see below).
+
+The default implementation of StringMatrix is called (surprise!) DefaultStringMatrix and provides yet more common operations. The only thing left to do to read alternate data sources is to implement the interface StringMatrixReader, which basically defines a method to read a string at position (x,y).
+
+Most data sources like Excel and CSV files only provide integer-based indices to the columns and rows, but we want name-based indices. DefaultStringMatrix reads these names from one column and one row, respectively. By default, it uses the topmost row for column names and the leftmost column for row names, but you can set this via constructor parameters.
+
+* Annotations for DelegatingObjectMap
+
+DelegatingObjectMap understands the following annotations:
+- null: 
+- ref=otherColumnName:  This is deprecated and only included for historical reasons. It acts as a reference to the value of a cell in the same row, in the given column. This will be replaced by a more general reference construct in a future version.
+- default-value=someValue: Use this as a row- or column-level annotation to specify a default value for all cells. If no value is found in a cell itself, this default value will be used instead. Use the null annotation to explicitly set a value to null.
+
+* Embedded Annotations
+
+DelegatingObjectMatrix does not define where the annotations come from. With a database or other file formats these may come from any kind of external metadata, for example. Usually when using DefaultStringMatrix, though, you will have an EmbeddedAnnotationMatrixDecorator sitting between the DefaultStringMatrix and the DelegatingObjectMatrix.
+
+This allows you to specify annotations inline, along with the cell values. The string in a cell can be either:
+
+  value
+  
+Which is just the value you want to see. Or it can one of the following:
+
+  value~annotation-key
+  value~annotation-key=
+  value~annotation-key=annotation-value
+  ~~annotation-key=annotation-value
+  
+The tilde (~) separates the "normal" cell value from the annotation, and the equals (=) separates the annotation key from its (optional) value. If there is no equals sign, the value will be an empty string. If there is the equals sign but no value, the annotation is /dynamic/, see below for more details. The final form without cell value but starting with a double tilde (~~) is a global annotation. Put this form into the naming row or column and this annotation will be shared by all cells in the matrix.
+
+A cell can not only have its own annotation, but also inherit annotations from the containing row or column:
+
++----------------------+----+----+
+|                      | C1 | C2 |
++----------------------+----+----+
+| R1~annot1=someValue  | K  | L  | (row 1)
++----------------------+----+----+
+| R1                   | A  | B  | (row 2)
++----------------------+----+----+
+| R1~annot2=           | X  | Y  | (row 3)
++----------------------+----+----+
+| R2~annot3=value      | M  | N  | (row 4)
++----------------------+----+----+
+| R2~annot4            | C  | D  | (row 5)
++----------------------+----+----+
+| R3~annot5=value      | E  | F  | (row 6)
++----------------------+----+----+
+
+The simplest case for this is for row "R3": All cells in this row inherit the annotation given in the naming column. So the cell (C1,R3) has the value "E" and the annotation "annot5"=>"value".
+
+The row "R1" is more interesting: As you can see, there are actually three of them. In this case, the rows are collapsed into one row, with all annotations being combined into one Properties object, and only the values of the last column "winning", unless there is one such row without an annotation. Confusing? The example will make it all clear in a moment.
+
+The other interesting thing is the /dynamic/ annotation, marked by the trailing equals sign. In this case, the value of the annotation will be taken from the cell in the column that we will be looking at.
+
+Alright, let's look at the example.
+
+The cell at (C1,R1):
+- has the value "A", because that is the value in row 2 - the only one without annotations
+- has the annotation "annot1"=>"someValue", because that annotation belongs to the row "R1" as well, and is a fixed-value annotation. The value "K" in column "C1" is discarded, because the rows are collapsed into row 2
+- has the annotation "annot2"=>"X", because annot2 is a dynamic annotation which takes its value from the column we're looking at, which is C1.
+
+The cell at (C2,R1) is similar to (C1,R1), except:
+- the value is "B"
+- the annotation "annot2" now has the value "Y"
+
+The cell at (C1,R2)
+- has the annotations "annot3"=>"" and "annot4"=>""
+- has the value "C". If no row is present without annotation markings, the last matching row in the matrix wins. In this example, there are two rows (4 and 5) with the name "R2", so row 5 wins.
+
+
+* ObjectMap and BeanFiller
+
+ObjectMatrix can (and is) used for many different purposes, but most of the time it forms the basis for DDT's data-driven testing system. In this system, the dataset for one test is one column in the matrix. This view is provided by ObjectMap, which is basically a one-dimensional ObjectMatrix, locked to one row or one column. ObjectMatrix defines creator methods for ObjectMaps.
+
+The most interesting part of DDT (and the simplest to use, once you understand the matrix and the annotations) is the BeanFiller, which sits on top of an ObjectMap and lets you fill entire object graphs at will.
+
+The central method is fillBean(beanName, bean), which takes your bean and fills it with data from all rows (or columns) whose name starts with the given beanName. There are a few variations of this method, check out the Javadoc for more info.
+
+* BeanFiller row name syntax
+
+BeanFiller uses the row names it finds to build the object graph. The syntax is very similar to the usual expression languages like PropertyUtils, JSF EL and JSP. Given the beanName "foo", a tree could look like this:
+
+foo.someField
+foo.someOtherField
+foo.aReference.yetAnotherField
+foo.anArray[0].someField
+foo.anArray[0].someOtherField
+foo.anArray[1].someField
+foo.anArray[1].someOtherField
+foo.aList[0].someField
+foo.aSet[0].someField
+foo.aSet[0].someOtherField
+foo.aMap[bar].someField
+
+As you can see, the tree can be arbitrarily deep and contain collections, maps and arrays. The default implementation can read and write both public and private fields and normal JavaBean-style get/set-properties.
+
+It might be surprising to see a Set reference with an index notation. This is a faked index - of course a Set doesn't have an index itself, but BeanFiller provides one so you can address the same object in more than one row, as shown above.
+
+The tree doesn't have to be completely prepared in the bean you pass in - BeanFiller will try and instantiate all objects it needs on its way along the graph. In the above example, if "foo.aReference" is null, BeanFiller will try to determine the type of aReference via reflection and then instantiate an object of the needed type. There are sane defaults for well-known interfaces like List, Map and Set.
+
+Sometimes you will want to specify a different type, or, for example in the case of collections, BeanFiller can't find the type via reflection. In this case you need to provide a type annotation (see above on how to give annotations).
+
+* BeanFiller annotations
+
+BeanFiller understands the following annotations:
+
+- type: gives the type for this particular reference as a fully qualified class name
+- element-type: given for a collection or array, it specifies the type the elements of this collection should have. Given for a map it takes two values, separated with a comma, to specify the key type and the value type.
+- ignore: indicates that this row should be ignored
+- ignore-if-null: indicates that this row should be ignored if its value is null
+- empty: indicates that an empty object should be constructed instead of ignoring the row (use in conjunction with ignore-if-null)
+
+* BeanAccessStrategy
+
+The way BeanFiller works with your objects is pluggable. If you work with POJOs (aka Java Beans) then you have to do nothing. The default JavaBeanAccessStrategy will try hard to get into your objects, both via standard getters and setters, as well as trying direct field access via reflection, even to protected and private fields. This default should work in almost all cases. But in case you have a really weird object model, have a look at the BeanAccessStrategy interface and provide an implementation suitable to your setup.
+
+

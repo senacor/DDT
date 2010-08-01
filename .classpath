@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="test/src"/>
+	<classpathentry excluding="*.java" kind="src" path="conf/classpath"/>
+	<classpathentry kind="src" path="src/ddtesting"/>
+	<classpathentry kind="src" path="src/typetransformer"/>
+	<classpathentry kind="src" path="src/objectmatrix"/>
+	<classpathentry kind="src" path="src/common"/>
+	<classpathentry kind="src" path="prof/java"/>
+	<classpathentry kind="lib" path="lib/parallel-junit.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/commons-beanutils-core.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/ant-junit.jar"/>
+	<classpathentry kind="lib" path="lib/ant.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/opencsv-1.7.jar"/>
+	<classpathentry kind="lib" path="lib/jxl-2.6.9.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

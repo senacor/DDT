@@ -1,0 +1,13 @@
+#TeXlipse project settings
+#Fri Feb 02 16:23:08 CET 2007
+builderNum=2
+outputDir=doc/
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=doc/tmp
+mainTexFile=ddt-with-ddt.tex
+outputFile=ddt-with-ddt.pdf
+langSpell=en
+markDer=true
+srcDir=doc/

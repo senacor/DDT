@@ -1,0 +1,237 @@
+<project name="ddt" default="dist" basedir=".">
+  <property file="conf/classpath/ddt-release-version.properties" />
+  <property name="src.dir" value="src" />
+  <property name="test.dir" value="test" />
+  <property name="build.dir" value="build" />
+  <property name="classes.dir" value="${build.dir}/classes" />
+  <property name="jar.dir" value="${build.dir}/jar" />
+  <property name="doc.dir" value="${build.dir}/doc" />
+  <property name="javadoc.dir" value="${build.dir}/javadoc" />
+  <property name="testresults.dir" value="${build.dir}/testresults"/>
+  <property name="testreport.dir" value="${build.dir}/testreport"/>
+  <property name="dist.dir" value="dist" />
+  <property name="lib.dir" value="lib/" />
+  <property name="buildlib.dir" value="buildlib/" />
+  <path id="compile.classpath">
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+    <!--fileset dir="${buildlib.dir}">
+      <include name="**/*.jar" />
+    </fileset-->
+  </path>
+  <path id="test.classpath">
+    <path refid="compile.classpath" />
+    <pathelement path="${classes.dir}/typetransformer" />
+    <pathelement path="${classes.dir}/objectmatrix" />
+    <pathelement path="${classes.dir}/common" />
+    <pathelement path="${classes.dir}/test" />
+    <pathelement path="${classes.dir}/ddtesting" />
+    <pathelement path="${build.dir}/test" />
+    <!--pathelement path="${buildlib.dir}" /-->
+    <pathelement path="${basedir}/conf/classpath" />
+  </path>
+  <target name="dist" depends="test, jar, src-zip, javadoc-zip, lib-zip">
+    <mkdir dir="${dist.dir}/temp/binaries" />
+    <copy todir="${dist.dir}/temp/binaries">
+      <fileset dir="${jar.dir}">
+        <include name="*.jar" />
+        <include name="*.zip" />
+      </fileset>
+    </copy>
+    <mkdir dir="${dist.dir}/temp/project" />
+    <copy todir="${dist.dir}/temp/project">
+      <fileset dir="${basedir}">
+        <include name="build.xml"/>
+        <include name="changelog.html"/>
+        <include name="doc/**"/>
+        <include name="LICENSE.txt" />
+        <include name=".settings/**" />
+        <include name=".project" />
+        <include name=".classpath" />
+        <include name="test/**" />
+        <include name=".texlipse" />
+        <!--include name="buildlib/**" /-->
+        <include name="conf/**"/>
+        <include name=".gitignore"/>
+        <include name="lib/**"/>
+        <include name="src/**"/>
+      </fileset>
+    </copy>
+    <copy todir="${dist.dir}/temp">
+      <fileset dir="${basedir}">
+        <include name="LICENSE.txt"/>
+        <include name="README.txt"/>
+      </fileset>
+    </copy>
+    <zip destfile="${dist.dir}/${ant.project.name}-${ddt-release-version}.zip" basedir="${dist.dir}/temp" />
+    <tar destfile="${dist.dir}/${ant.project.name}-${ddt-release-version}.tar.bz2" compression="bzip2" longfile="gnu" basedir="${dist.dir}/temp" />
+    <delete dir="${dist.dir}/temp" />
+    <echo message="Finished building DDT version ${ddt-release-version}." />
+  </target>
+  <target name="test" depends="test-compile" unless="skip.tests">
+    <copy todir="${build.dir}/test">
+      <fileset dir="${test.dir}/src">
+        <include name="**/*" />
+      </fileset>
+    </copy>
+    <mkdir dir="${testreport.dir}"/>
+    <mkdir dir="${testresults.dir}"/>
+    <junit haltonfailure="yes" showoutput="no" printsummary="on" failureproperty="test.failed">
+      <classpath>
+        <path refid="test.classpath" />
+      </classpath>
+      <!--test name="com.senacor.ddt.AllTests" todir="${testresults.dir}"/-->
+      <batchtest todir="${testresults.dir}" haltonfailure="yes">
+        <fileset dir="${test.dir}/src">
+          <include name="**/*Test*.java"/>
+          <exclude name="**/Abstract*.java"/>
+        </fileset>
+      </batchtest>
+
+      <formatter type="xml" />
+    </junit>
+    <junitreport  todir="${testreport.dir}">
+      <fileset dir="${testresults.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report todir="${testreport.dir}"/>
+    </junitreport>
+  	<fail if="test.failed"/>
+  </target>
+  <target name="test-compile" depends="compile">
+    <mkdir dir="${classes.dir}" />
+    <mkdir dir="${classes.dir}/test" />
+    <javac srcdir="${test.dir}/src" destdir="${classes.dir}/test" source="1.4" target="1.4" debug="yes" encoding="UTF-8">
+      <classpath refid="test.classpath" />
+    </javac>
+  </target>
+  <target name="src-zip">
+    <mkdir dir="${jar.dir}/temp" />
+    <copy todir="${jar.dir}/temp/src">
+      <fileset dir="${src.dir}">
+        <include name="**/*" />
+      </fileset>
+    </copy>
+    <copy todir="${jar.dir}/temp/test">
+      <fileset dir="${test.dir}">
+        <include name="**/*" />
+      </fileset>
+    </copy>
+    <zip destfile="${jar.dir}/${ant.project.name}-${ddt-release-version}-src.zip" basedir="${jar.dir}/temp" />
+    <delete dir="${jar.dir}/temp" />
+  </target>
+  <target name="lib-zip">
+    <zip destfile="${jar.dir}/${ant.project.name}-${ddt-release-version}-runtime-dependencies.zip" basedir="${lib.dir}" />
+    <!--zip destfile="${jar.dir}/${ant.project.name}-${ddt-release-version}-buildonly-dependencies.zip" basedir="${buildlib.dir}" /-->
+  </target>
+  <patternset id="files.to.jar">
+    <include name="**/*.properties" />
+    <include name="**/*.xml" />
+    <include name="**/*.class" />
+    <exclude name="**/log4j.xml" />
+  </patternset>
+  <fileset id="conf.classpath.files" dir="conf/classpath">
+    <patternset refid="files.to.jar" />
+  </fileset>
+  <target name="jar" depends="compile">
+    <mkdir dir="${jar.dir}" />
+    <delete>
+      <fileset dir="${jar.dir}">
+        <include name="*" />
+      </fileset>
+    </delete>
+    <jar destfile="${jar.dir}/ddt-common-${ddt-release-version}.jar">
+      <fileset dir="${classes.dir}/common">
+        <patternset refid="files.to.jar" />
+      </fileset>
+      <fileset refid="conf.classpath.files" />
+    </jar>
+    <jar destfile="${jar.dir}/ddt-typetransformer-${ddt-release-version}.jar">
+      <fileset dir="${classes.dir}/typetransformer">
+        <patternset refid="files.to.jar" />
+      </fileset>
+      <fileset refid="conf.classpath.files" />
+    </jar>
+    <jar destfile="${jar.dir}/ddt-objectmatrix-${ddt-release-version}.jar">
+      <fileset dir="${classes.dir}/objectmatrix">
+        <patternset refid="files.to.jar" />
+      </fileset>
+      <fileset refid="conf.classpath.files" />
+    </jar>
+    <jar destfile="${jar.dir}/ddt-ddtesting-${ddt-release-version}.jar">
+      <fileset dir="${classes.dir}/ddtesting">
+        <patternset refid="files.to.jar" />
+      </fileset>
+      <fileset refid="conf.classpath.files" />
+    </jar>
+    <jar destfile="${jar.dir}/ddt-complete-${ddt-release-version}.jar">
+      <fileset dir="${classes.dir}/ddtesting">
+        <patternset refid="files.to.jar" />
+      </fileset>
+      <fileset dir="${classes.dir}/common">
+        <patternset refid="files.to.jar" />
+      </fileset>
+      <fileset dir="${classes.dir}/objectmatrix">
+        <patternset refid="files.to.jar" />
+      </fileset>
+      <fileset dir="${classes.dir}/typetransformer">
+        <patternset refid="files.to.jar" />
+      </fileset>
+      <fileset refid="conf.classpath.files" />
+    </jar>
+  </target>
+  <target name="compile">
+    <mkdir dir="${classes.dir}" />
+    <mkdir dir="${classes.dir}/common" />
+    <javac srcdir="${src.dir}/common" destdir="${classes.dir}/common" source="1.4" target="1.4" debug="yes" encoding="UTF-8">
+      <classpath refid="compile.classpath" />
+    </javac>
+    <mkdir dir="${classes.dir}/typetransformer" />
+    <javac srcdir="${src.dir}/typetransformer" destdir="${classes.dir}/typetransformer" source="1.4" target="1.4" debug="yes" encoding="UTF-8">
+      <classpath refid="compile.classpath" />
+      <classpath path="${classes.dir}/common" />
+    </javac>
+    <mkdir dir="${classes.dir}/objectmatrix" />
+    <javac srcdir="${src.dir}/objectmatrix" destdir="${classes.dir}/objectmatrix" source="1.4" target="1.4" debug="yes" encoding="UTF-8">
+      <classpath refid="compile.classpath" />
+      <classpath path="${classes.dir}/common" />
+      <classpath path="${classes.dir}/typetransformer" />
+    </javac>
+    <mkdir dir="${classes.dir}/ddtesting" />
+    <javac srcdir="${src.dir}/ddtesting" destdir="${classes.dir}/ddtesting" source="1.4" target="1.4" debug="yes" encoding="UTF-8">
+      <classpath refid="compile.classpath" />
+      <classpath path="${classes.dir}/typetransformer" />
+      <classpath path="${classes.dir}/objectmatrix" />
+      <classpath path="${classes.dir}/common" />
+    </javac>
+  </target>
+  <target name="clean">
+    <delete dir="${build.dir}" />
+    <delete dir="${dist.dir}" />
+    <delete dir="${jar.dir}" />
+  </target>
+  <target name="javadoc" depends="compile" description="generates JavaDoc from sources">
+    <mkdir dir="${javadoc.dir}" />
+    <javadoc author="true"
+             destdir="${javadoc.dir}"
+             packagenames="*"
+             use="true"
+             version="true"
+             windowtitle="documentation"
+             private="true"
+             encoding="ISO-8859-1"
+             source="1.4"
+             verbose="false"
+    >
+      <fileset dir="${src.dir}/common" />
+      <fileset dir="${src.dir}/typetransformer" />
+      <fileset dir="${src.dir}/objectmatrix" />
+      <fileset dir="${src.dir}/ddtesting" />
+      <classpath refid="compile.classpath" />
+    </javadoc>
+  </target>
+  <target name="javadoc-zip" depends="javadoc">
+    <zip destfile="${jar.dir}/${ant.project.name}-${ddt-release-version}-javadoc.zip" basedir="${javadoc.dir}" />
+  </target>
+</project>

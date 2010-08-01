@@ -1,0 +1,58 @@
+\include{document_defs}
+
+
+\begin{document}
+
+% Definition of title page:
+\title{Pinselohrschwein Doku}
+\author{Hannes Leitl}
+\date{\today}	% optional
+\maketitle 
+
+\tableofcontents
+
+\section{Merkmale}\label{sec:merkmale} % (fold)
+Pinselohrschweine zählen zu den am auffälligsten gefärbten Schweinen (s. Abbildung \ref{foto}). Die Grundfärbung ihres Fells ist rötlichbraun, entlang des Rückens erstreckt sich ein weißer Aalstrich. Das Gesicht ist schwarz gefärbt und weist weiße Augenringe und einen weißen Rüssel auf. Charakteristisch ist der lange Backenbart und die namensgebenden schwarzen oder weißen Büschel an den blätterförmigen Ohren. Beide Geschlechter haben Hauer. Diese verlängerten Eckzähne wachsen aus Ober- und Unterkiefer und schleifen sich aneinander ab. Die Männchen haben außerdem warzenartige Auswüchse des Nasenbeins unterhalb der Augen.
+
+Der Körperbau ist rundlich, die Beine sind kurz und kräftig und der verhältnismäßig lange Schwanz ist abgesehen von der Quaste unbehaart. Diese Tiere erreichen eine Kopfrumpflänge von 100 bis 150 Zentimeter, eine Schulterhöhe von 55 bis 80 Zentimeter und ein Gewicht von 45 bis 120 Kilogramm.
+% section merkmale (end)
+
+\begin{figure}[tbp]
+	\centering
+	\includegraphics[scale=0.4]{media/pinselohr.jpg}
+	\caption{Foto eines Pinselohrschweins}
+	\label{foto}
+\end{figure}
+
+\section{Verbreitung und Lebensweise}\label{sec:verbreitung_und_lebensweise} % (fold)
+Pinselohrschweine leben im westlichen und zentralen Afrika, ihr Verbreitungsgebiet erstreckt sich vom Senegal bis in die Demokratische Republik Kongo. Sie sind nicht wählerisch in Bezug auf ihren Lebensraum\footnote{Das ist gut zu wissen, denn ich hätte auch gerne eines daheim.} und finden sich sowohl in Wäldern als auch in Savannen und Sümpfen zu finden. Allzu trockene Gebiete meiden sie jedoch.
+% section verbreitung_und_lebensweise (end)
+
+\begin{figure}[tbp]
+	\centering
+	\includegraphics[scale=0.7]{media/class_diagramm.pdf}
+	\caption{Der Platz des Pinselohrschweins in der Klassenhierarchie}
+	\label{diagramm}
+\end{figure}
+
+\section{Verwendung}\label{sec:verwendung} % (fold)
+Objekte der Klasse \emph{Pinselohrschwein} haben verblüffende Methoden anzubieten. Folgendes Quelltext-Beispiel zeigt die typische Verwendung:
+% section verwendung (end)
+
+\begin{lstlisting}[frame=tb]{}
+public class PinselohrschweinGehegeTest extends TestCase
+{
+	/**
+	 * Der Klassiker unter den Schweinetests: 
+	 * Wenn ein Schwein nicht oinkt, ist was faul.
+	 */
+	public void testSchweinerei() throws Exception {
+		Pinselohrschwein schwein = new Pinselohrschwein();
+		List laute = schwein.grunz();
+		assertTrue("Mein Schwein ist krank", 
+			laute.contains(Pinselohrschwein.OINK));
+	}
+}
+\end{lstlisting}
+
+\end{document}

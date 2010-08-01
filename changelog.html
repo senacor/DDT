@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>DDT Changelog</title>
+<style type="text/css">
+body {
+  background: white;
+  color: black;
+/*  font-family: "Trebuchet MS", sans-serif;*/
+  padding: 2em;
+}
+
+h1 {
+  margin: 0em;
+  padding: 0em;
+  font-weight: bold;
+  font-size: 250%;
+}
+
+#releaselist {
+  padding: 0em;
+  margin: 0em;
+  margin-top: 0.5em;
+}
+
+.release {
+  padding: 0em;
+  margin-left: 1.3em;
+  margin-bottom: 2em;
+}
+
+.releaseversion {
+  margin: 0em;
+  display: inline;
+  font-size: 150%;
+}
+
+.releasedate {
+  margin: 0em;
+  margin-left: 1em;
+  display: inline;
+  color: #888888;
+  font-size: 150%;
+  font-style: italic;
+}
+
+.changelist {
+  list-style-type: none;
+  /*font-family: "Palatino Linotype", "Palatino", serif;*/
+}
+
+.change:before,.incompatiblechange:before {
+  content: "Change - ";
+  font-weight: bold;
+}
+
+.incompatiblechange:before {
+  content: "Incompatible change! - ";
+  font-weight: bold;
+}
+
+.new:before {
+  font-weight: bold;
+  content: "New - ";
+}
+
+.fix:before {
+  font-weight: bold;
+  content: "Fix - ";
+}
+
+li {
+  text-indent: 0em;
+}
+
+.changelist li.change,.changelist li.new,.changelist li.fix,.changelist li.incompatiblechange
+  {
+  text-indent: -1em;
+  margin-bottom: 0.5em;
+}
+
+.changelist ul.bullets {
+  list-style-type: disc;
+}
+</style>
+</head>
+<body>
+<h1>DDT Changelog</h1>
+<ul id="releaselist">
+  
+  <li class="release">
+    <h2 class="releaseversion">3.1.0-RC5</h2>
+    <h3 class="releasedate">2010-08-01</h3>
+    <ul class="changelist">
+      <li class="change">
+        First release on github.
+      </li>
+      <li class="incompatiblechange">
+        After discovering a serious performance issue with transformers, the public API unfortunately had to be broken
+        to enable a fix. The root cause was that in some scenarios, many more <code>CannotTransformExceptions</code> were created than
+        anticipated. This turned out to have a very strong impact on performance. Therefore this exception has been completely
+        removed from DDT. <code>SpecificTransformer</code> implementations can no longer throw this
+        exception to signal that the master <code>Transformer</code> should try the next transformer in the chain. Instead, they must now
+        return the magic object <code>SpecificTransformer.TRY_NEXT</code>. Fatal errors can still be signaled with <code>TransformationFailedException</code>.
+        <code>Transformer</code> will now throw a <code>NoSuccessfulTransformerException</code> if no transformer in the chain was able
+        to perform the transformation.
+      </li>
+    </ul>
+  </li>
+  <li class="release">
+    <h2 class="releaseversion">3.1.0-RC4</h2>
+    <h3 class="releasedate">2009-06-19</h3>
+    <ul class="changelist">
+      <li class="fix">Fixed BeanFiller sorting List and Array indices likes Strings, not numerically, i.e. 1, 10, 2 instead of 1, 2, 10.
+      </li>
+      <li class="fix">Fixed serious issue in JavaBeanAccessStrategy where non-identical objects whose equals()-method 
+        nonetheless returns true (think value objects) could get lost or mixed up.
+      </li>
+    </ul>
+  </li>
+  <li class="release">
+    <h2 class="releaseversion">3.1.0-RC3</h2>
+    <h3 class="releasedate">Spring 2009</h3>
+    <ul class="changelist">
+      <li class="incompatiblechange">Transformer now runs the transformer chain even if the given object is already of the desired type. For example, this can (and will) be
+        used to implement string substitution in strings read from an ObjectMatrix just by adding a SpecificTransformer that transforms from String to String. This may
+        cause problems in existing code, but that is extremely unlikely.
+      </li>
+      <li class="incompatiblechange">DelegatingObjectMatrix#getString() now doesn't just use the String it gets from the underlying StringMatrix, but instead calls
+        its local Transformer. This is directly related to the change in Transformer, and done for the same reason. This may
+        cause problems in existing code, but that is extremely unlikely.
+      </li>
+      <li class="fix">ConstructorTransformer now works with empty/null delimiter strings and simply looks for single-parameter constructors in those cases.</li>
+      <li class="change">Build process cleaned up somewhat. "ant dist" will now spit out exactly the file that was downloaded from the release site. The next release (3.2)
+        will probably be built with Maven.</li>
+      <li class="fix">Fixed setting property of object that was instantiated from a matrix cell.</li>
+      <li class="fix">Fixed blank (non-empty whitespace-only) string handling for DOM#getObject: now returns null only if the string actually is empty
+        (or there is a null annotation).
+      </li>
+      <li class="fix">Fixed array type handling in ClassTransformer: can handle multidimensional arrays now.</li>
+    </ul>
+  </li>
+  <li class="release">
+  <h2 class="releaseversion">3.1.0-beta9</h2>
+  <h3 class="releasedate">unreleased</h3>
+  <ul class="changelist">
+    <li class="change">DefaultStringMatrix now throws KeyNotFoundException (Row/ColumnNotFoundException) instead of the generic IllegalArgumentException.</li>
+  	<li class="fix">Error message when a property is not found in a bean now shows the correct class name and not "java.lang.Object".</li>
+  	<li class="change">getConcreteType() was moved from BeanFiller to JavaBeanAccessStrategy, since it's only needed there.</li>
+    <li class="change">The ~default-value annotation was pulled down to DelegatingObjectMatrix from BeanFiller, and so is available
+    for all get*-Methods, not just bean filling.</li>
+    <li class="fix">The ~empty annotation now is recognized by ~ignore-if-null and causes the cell to be <em>not</em> ignored.</li>
+    <li class="change">PackageClassTransformer no longer includes java.lang and java.util in each instance. Instead Transformer
+    now includes a static PackageClassTransformer instance containing the packages java.lang, java.util and java.math.</li>
+    <li class="new">PackageClassTransformer can now be frozen so it does not accept any new packages. This is mainly used
+    to guarantee stable behavior of the static default instance.</li>
+  </ul>
+  </li>
+  <li class="release">
+  <h2 class="releaseversion">3.1.0-beta8</h2>
+  <h3 class="releasedate">2007-04-23</h3>
+  <ul class="changelist">
+    <li class="fix">Fixed RelativeDateTransformer and StringPatternDateTransformer returning Date on being asked for GregorianCalendar. It will now return
+    util.Date, sql.Date, Calendar.getInstance or GregorianCalendar when asked for one of these types, and fail on any other type.</li>
+    <li class="fix">BeanFiller no longer attempts to find a concrete type when discovering a property of an abstract or
+    interface type. The transformers are now expected to manage this. Only BeanAccessStrategies look for concrete types when being
+    asked to instantiate a property.</li>
+    <li class="fix">NumberTransformer now returns Integers when asked for a Number.</li>
+  </ul>
+  </li>
+  <li class="release">
+  <h2 class="releaseversion">3.1.0-beta7</h2>
+  <h3 class="releasedate">2007-03</h3>
+  <ul class="changelist">
+    <li class="change">BeanFiller now understands the ~empty annotation to force creation of empty objects like strings ('').</li>
+    <li class="change">BeanFiller now gets an ObjectHolder for the root bean from the BeanAccessStrategy.</li>
+    <li class="change">BeanFiller now can have arrays, maps and collections as root beans.</li>
+    <li class="change">All calls to Class.forName() not inside the typetransformer module were replaced with calls to
+    Transformer#transform(classname, Class.class).</li>
+    <li class="new">Added ClassTransformer.</li>
+    <li class="new">BeanFiller can now also traverse into Maps and fill them (implemented MapWrapper).</li>
+    <li class="new">EmbeddedAnnotationMatrixDecorator now supports global annotations (~~key=value).</li>
+    <li class="new">BeanFiller now supports a default-value=foo annotation to provide a default value for empty cells.</li>
+    <li class="new">BeanFiller now allows to skip keys with a prefix filter.</li>
+    <li class="new">JUnitTestSuiteBuilder now allows filtering of test methods with regular expressions.</li>
+    <li class="new">Made BeanAccessStrategy pluggable via TestSuiteConfig</li>
+    <li class="new">JavaBeanAccessStrategy (formerly PropertyUtilsStrategy) now tries direct field access via reflection if
+    PropertyUtils don't succeed</li>
+    <li class="new">ObjectGraphDumper now emits more type information</li>
+    <li class="fix">TestCaseData now supports the nameless fillBean(Object) call.</li>
+    <li class="new">Added PackageClassTransformer. This transformer is not used by default, if you need it, you have to add it
+    to the master Transformer yourself.</li>
+  </ul>
+  </li>
+  <li class="release">
+  <h2 class="releaseversion">3.1.0-beta6</h2>
+  <h3 class="releasedate">internal</h3>
+  <ul class="changelist">
+    <li class="new">Added BeanFiller#createAndFillBean</li>
+  </ul>
+  </li>
+  <li class="release">
+  <h2 class="releaseversion">3.1.0-beta5</h2>
+  <h3 class="releasedate">2007-01-29</h3>
+  <ul class="changelist">
+    <li class="incompatiblechange">The BeanFiller flags lenientWhenNoValidRow and lenientWithMissingProperties were removed.
+    Catch the thrown exceptions if you really need to use broken matrices.</li>
+    <li class="incompatiblechange">Annotations that take a value from a cell now have to use the suffix "=". Key-only
+    annotations are unchanged, annotations with embedded value take the usual form of "~key=value".</li>
+    <li class="fix">JExcelStringMatrixReader now correctly deals with merged cells.</li>
+    <li class="change">BeanFiller refactored. Yes, this is finally the big BeanFiller refactoring we've been waiting for.
+    BeanFiller now treats all objects (including arrays and collections) as opaque beans with named properties. All operations on
+    these beans are handled by BeanAccessStrategy instances.</li>
+    <li class="change">CSVStringMatrixReader now uses OpenCSV (opencsv.sourceforge.net) to read CSV files. This was easier than
+    to adapt the existing parser to properly read CSVs containing quoted fields. The drawback: The CSV-related constructors changed
+    to only allow chars as delimiters and not arbitrary regexes, since that is all OpenCSV can handle. Nobody was using those, so
+    the impact should be minimal.</li>
+    <li class="change">Split StringMatrix into StringMatrix and IndexedStringMatrix.</li>
+    <li class="new">Annotation handling now centralized in EmbeddedAnnotationMatrixDecorator. Yes, this is finally the big
+    Annotation refactoring we've been waiting for.</li>
+    <li class="fix">Fixed handling of new Transformer exceptions in DelegatingObjectMatrix.</li>
+  </ul>
+  </li>
+  <li class="release">
+  <h2 class="releaseversion">3.1.0-beta4</h2>
+  <h3 class="releasedate">2006-11-09</h3>
+  <ul class="changelist">
+    <li class="new">Re-added a StringPatternDateTransformer for years ("yyyy").</li>
+    <li class="fix">Fixed weird class initialization issue caused by reflection. See Transformer#transform for details.</li>
+    <li class="new">Added NumberTransformer to handle all JDK Number types.</li>
+    <li class="change">Changed Transformer from a classic GoF-style Chain of Responsibility to a managed chain.
+    SpecificTransformers no longer call the next transformer on their own. They now throw a CannotTransformException and the master
+    Transformer tries the next ST in the chain.</li>
+    <li class="change">Changed build.xml to include version number in dist zip name.</li>
+    <li class="fix">Removed duplicate ObjectGraphDumper from package com.l00world.ddt.objectmatrix.util. The one in package
+    ...beanfiller.util is the correct one.</li>
+  </ul>
+  </li>
+  <li class="release">
+  <h2 class="releaseversion">3.1.0-beta3</h2>
+  <h3 class="releasedate">2006-11-06</h3>
+  <ul class="changelist">
+    <li class="change">Separated DDT into several modules and jar files:
+    <ul class="bullets">
+      <li>common</li>
+      <li>typetransformer</li>
+      <li>objectmatrix</li>
+      <li>ddtesting</li>
+    </ul>
+    </li>
+    <li class="change">Migrated all custom ConvertUtils converters to the new transformer module</li>
+    <li class="new">Introduced local master transformer to DelegatingObjectMatrix</li>
+    <li class="change">Split AbstractDsmBasedObjectMatrixFactory into AbstractDelegatingOMBasedObjectMatrixFactory and
+    AbstractDefaultStringMatrixBasedObjectMatrixFactory. Soon we will be competing with Spring for the title of "most absurdly long
+    class name in the world".
+    <li class="change">Moved transformers from ddt.objectmatrix.typetransformer to ddt.typetransformer</li>
+    <li class="change">Stripped DateTransformer (former DateConverter) down to RelativeDateTransformer. Absolute dates are
+    transformed by StringPatternDateTransformer.</li>
+    <li class="change">Updated JXL to version 2.6.1</li>
+    <li class="change">Split AbstractTransformer into AbstractTransformer (handles get/setNextTransformer) and new
+    AbstractGuardedTransformer (handles can/doTransform).</li>
+    <li class="new">Introduced RecursiveTransformer interface to allow callbacks to the master transformer.</li>
+    <li class="new">Added new fillBean-method to BeanFiller that infers the bean name from the bean's class name.</li>
+    <li class="new">Added &lt;rowname&gt;~ignore token for row to "comment out" entire rows</li>
+    <li class="new">Added DateFormatTransformer allowing date transformation based on standard Java DateFormat instances.</li>
+    <li class="new">Added debugMode flag to AbstractTransformer. Subclasses can use that to output more information on the
+    transformation process.</li>
+    <li class="new">Added ObjectGraphDumper</li>
+    <li class="fix">Made Report.messages non-static</li>
+  </ul>
+  </li>
+  <li class="release">
+  <h2 class="releaseversion">3.1.0-beta2</h2>
+  <h3 class="releasedate">2006-10-20</h3>
+  <ul class="changelist">
+    <li class="change">Moved all fill methods (fillList, fillMap) and related stuff from ObjectMatrix/DelegatingObjectMatrix to
+    BeanFiller, because they really belong there.</li>
+    <li class="change">Removed obsolete AbstractAnnotatedStringMatrixReader.</li>
+    <li class="new">Added StringPatternDateTransformer as flexible replacement for the absolute-date part of DateConverter.</li>
+    <li class="new">Added AnnotatedStringMatrix interface as part of the ongoing annotation-processing refactoring.</li>
+    <li class="change">Moved StringMatrixReader into DefaultStringMatrix as a nested interface, since it is only used there.</li>
+    <li class="new">Added new StringMatrixReader implementation: PropertyFileStringMatrixReader for reading bundles of property
+    files.</li>
+  </ul>
+  </li>
+  <li class="release" id="3.1.0-beta1">
+  <h2>3.1.0-beta1</h2>
+  </li>
+</ul>
+</body>
+</html>

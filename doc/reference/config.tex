@@ -1,0 +1,114 @@
+\documentclass[
+   12pt,                % Schriftgroesse 12pt
+   a4paper,             % Layout fuer Din A4
+   oneside,             % Layout fuer einseitigen Druck
+   headinclude,         % Kopfzeile wird Seiten-Layouts mit beruecksichtigt
+   %headsepline,         % horizontale Linie unter Kolumnentitel
+   %plainheadsepline,    % horizontale Linie auch beim plain-Style
+   BCOR12mm,            % Korrektur fuer die Bindung
+   DIV18,               % DIV-Wert fuer die Erstellung des Satzspiegels, siehe scrguide
+   halfparskip,         % Absatzabstand statt Absatzeinzug
+   openany,             % Kapitel können auf geraden und ungeraden Seiten beginnen
+   bibtotoc,            % Literaturverz. wird ins Inhaltsverzeichnis eingetragen
+   pointlessnumbers,    % Kapitelnummern immer ohne Punkt
+   tablecaptionabove,   % korrekte Abstaende bei TabellenUEBERschriften
+   titlepage,			% ja bitte titelei
+   nochapterprefix,
+   appendixprefix,
+   fleqn,               % fleqn: Glgen links (statt mittig)
+   %draft               % Keine Bilder in der Anzeige, overfull hboxes werden angezeigt
+     ]{scrartcl}
+
+%\usepackage[onehalfspacing]{setspace}
+\makeatletter
+%\renewcommand*{\chapterheadstartvskip}{%
+%	  {\setlength{\@tempdima}{\f@baselineskip}%
+%	  \vspace*{2.3\@tempdima}}%
+%	}
+%\renewcommand*{\chapterheadendvskip}{%
+%	  {\setlength{\@tempdima}{\f@baselineskip}%
+%	    \vspace{1.725\@tempdima
+%	      \@plus .115\@tempdima \@minus .192\@tempdima}}%
+%	}
+%\makeatother
+%\usepackage{ngerman}             % neue Rechtschreibung
+%\usepackage[ansinew]{inputenc}  % Input-Encodung: ansinew fuer Windows
+\usepackage[latin1]{inputenc}    % Input-Encodung: latin1 fuer Unix
+\usepackage[T1]{fontenc}         % T1-kodierte Schriften, korrekte Trennmuster fuer Worte mit Umlauten
+%\usepackage{caption}      % mehrzeilige Captions ausrichten
+\usepackage{url} 				 % fuer was auch immer
+\usepackage[centertags]{amsmath} % AMS-Mathematik, centertags zentriert Nummer bei split
+%\usepackage{latexsym}           % verschiedene Symbole
+%\usepackage{textcomp}           % verschiedene Symbole
+     
+%\usepackage[pdftex]{graphicx}            % zum Einbinden von Grafiken
+\usepackage{graphicx}            % zum Einbinden von Grafiken
+\usepackage{float}               % u.a. genaue Plazierung von Gleitobjekten mit H
+
+\usepackage{scrpage2}            % Kopf und Fusszeilen-Layout 
+\renewcommand{\headfont}{\normalfont\sffamily}    % Kolumnentitel serifenlos
+\renewcommand{\pnumfont}{\normalfont\sffamily}    % Seitennummern serifenlos
+\pagestyle{scrheadings}
+
+% kopfzeile - links mitte rechts
+\ihead[]{DDT Reference Documentation}              % Kolumnentitel immer oben innen
+\chead[]{}
+\ohead[\pagemark]{\pagemark}     % Seitennummern immer oben aussen
+% fusszeile - links mitte rechts.
+\ifoot[]{}
+\cfoot[]{}
+\ofoot[]{}                       % Seitennummern in der Fusszeile loeschen
+\rohead{ \includegraphics[scale=0.5]{image/logo.pdf}}
+\rofoot{\pagemark}
+%\setheadwidth{textwithmarginpar}
+%\setfootwidth{textwithmarginpar}
+%\newcommand{\titleRule}{\rule{\linewidth}{0.5mm}}
+
+
+\reversemarginpar
+
+% Schrift mit Serifen auch fuer Ueberschriften benutzen
+%\renewcommand*{\sectfont}{\bfseries}
+%\renewcommand*{\descfont}{\bfseries}
+
+% define the wanted font for all highlightings here
+\def\lstbasicfont{\fontfamily{pcr}\selectfont}
+
+%% for sourcecode we use listings-package
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{listings}
+\definecolor{senacorlight}{rgb}{0.96,0.945,0.90} % original Senacor background color
+\lstloadlanguages{Java}
+\lstset{% general command to set parameter(s)+
+basicstyle={\lstbasicfont\footnotesize},
+%basicstyle={\ttfamily\small}, % print whole listing small
+keywordstyle=\bfseries, % bold black keywords
+basewidth=0.51em,
+identifierstyle=\color{Black}, % gray
+commentstyle=\color{Black}\itshape, % white comments
+stringstyle=\color{Black}, % typewriter type for strings
+showstringspaces=false, % no special string spaces
+language=Java,
+tabsize=2,
+backgroundcolor=\color{senacorlight}
+}
+
+%\usepackage[intoc,german]{nomencl}
+%\usepackage[german]{nomencl}
+%\renewcommand{\nomname}{Glossar}
+%\makenomenclature
+%%% some defines
+
+\typearea[current]{current}        % Neuberechnung des Satzspiegels mit alten Werten nach Änderung von Zeilenabstand,etc
+
+%\usepackage{amsart}
+
+\usepackage{ae}                  % Für PDF-Erstellung
+\usepackage{pdfsync}
+\usepackage[pdftex,a4paper,
+            pdftitle={DDT Reference Documentation},
+			pdfauthor={Carl-Eric Menzel},
+            colorlinks=false,
+            bookmarks=true,
+            bookmarksnumbered=true]{hyperref}
+

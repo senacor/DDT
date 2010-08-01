@@ -1,0 +1,5 @@
+Name;Test
+foo.bar[1].val;1
+foo.bar[2].val;2
+foo.bar[10].val;3
+foo.bar~element-type=com.senacor.ddt.objectmatrix.beanfiller.LineSortingTest$Bar;

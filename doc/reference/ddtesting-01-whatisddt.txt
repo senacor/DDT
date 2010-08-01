@@ -1,0 +1,47 @@
+DDT Reference Documentation
+Section 1: What is Data Driven Testing?
+
+We all love seeing the green bar light up after a test run. It shows us that our code works as we think it should, and we can confidently move on to the next step in our work. Of course, nobody in their right mind will claim that every part of a program is equally well tested for all possible scenarios. 100% test coverage is hardly possible, neither with line-by-line coverage nor with all possible input values. 100% coverage is also unnecessary, if we choose our tests carefully.
+
+* The Input Problem
+It's easy to write good tests if you are testing a small unit of functionality - perhaps one method with one or two simple parameters, returning a simple value and possibly performing some kind of side effect. But the more complex your application becomes, the more complex your methods will inevitably become. [Footnote: Of course, we all try to keep this complexity down, but most applications contain some inherently complex business logic.]
+
+Imagine, for example, you have a method that takes only a single parameter: The root of a tree of objects, which represents a central part of your problem domain. Your method is supposed to perform a simple operation with the data in this tree, and so you write a simple test that calls the method and checks the result for correctness. You get a green bar and move on.
+
+But have you tested what happens if the data looks a little different? A value here or there is (legitimately) null? Something in a list is not quite in the order which you expect [Footnote: This can easily happen with user-supplied data, for example, or if you read legacy data written by other applications.]? You come up with a slightly varied test setup and write another quick test to verify your implementation.
+
+In many cases, this is enough. But it does not scale. Rich, complex applications often require equally rich and complex input. It is tedious at best, tiring and error-prone at worst to manually write test cases for each interesting edge case or test setup you might need to verify. Worse, you end up writing almost the same code for each test, because you are still testing that one method, which you always call in the same way. The only things that change between the test cases are the input data and the expected outcome that you are looking for. People who are easily bored (many programmers are, I know I am) tend to become careless with repetitive, tedious tasks. The result: You don't test as much as you should or want to. This is where data-driven testing comes in.
+
+* Automating Input
+If the only thing that changes between test cases is setting up the input values and determining the expected outcome, the obvious solution is to just write the actual test code once, and read the input and output data from some kind of data source. This can be something as simple as opening a text file and reading a few lines with BufferedReader#readLine(). So you whip up a quick file format, parse it into your test, and off you go to meet the green bar.
+
+Almost anybody's first attempt at this will look somewhat like this: You open your data source, you read line by line of data, slowly assembling the graph of objects you want to run your test on:
+
+ [code]
+ myObject.setFoo(file.read("foo"));
+ myObject.setBar(file.read("bar"));
+ myObject.getFoo().setBaz(file.read("baz"));
+ // ...and so on for 50 more lines...
+ [/code]
+
+That's a whole lot of code, typing and fragile String literals to set up an object tree. Wouldn't it be great if you could just say fillBean(myObject)?
+
+This is where DDT comes in.
+
+* Help the Users Help You
+Your product is delivered, everybody is happy, until a few weeks later, you get a critical bug report - something doesn't quite work as the customer expected. You have a look at the bug data and scratch your head: This input was never specified anywhere, no wonder it didn't work! But of course the customer insists that this is exactly what he meant when he wrote the specifications.
+
+How can you avoid this? In an ideal world, you'd get good example data from your customer along with the specification. In the real world, you'll be lucky if you even get moderately coherent specs. You have to come up with your own test data, among other things. You almost inevitably will miss something that the user expects to "just work".
+
+Why not make the customer give you usable test data? "Right", you say, "as if those barely literate MBAs could come up with exhaustive data sets, let alone in the format my test code needs!"
+
+You're right about that, of course. But they will still come and nag you with every single bug, so it will quickly pay off to try and help them. Work together with them, helping them not only with specifying what the application should do. Help them with giving you good test data. Give them a tool they are familiar with and friendly descriptions of what you need instead of The Matrix.[Footnote: Of course your data files are perfectly logical and easy to understand. But you know that whenever you point the customers at something as strange as a programmer's text editor, their eyes glaze over and they only see weird green falling letters, no matter what is actually on the screen.]
+
+What tool do the users really know? Any suit worth his necktie knows how to type stuff into Excel sheets. And to be honest, it is nice to quickly whip up some tables of data. Let's keep them happy inside their spreadsheets, and use this to our advantage.
+
+This is also where DDT comes in.
+
+* Easy-to-use, collaborative data-driven testing
+DDT combines the solutions to these two problems. It defines a clean, easy to understand test format (the ObjectMatrix) and allows you to choose from a number of filetypes you can read, including the Excel spreadsheet files your users love so much. It fills complex object trees with a simple method call. It makes it easy and clean to read the ugly binary blobs that Microsoft calls a file format.[Footnote: We use Andy Khan's excellent JExcel library for the actual reading. DDT provides a comfortable abstraction for test data on top of that, and on top of other file formats like CSV or Properties.] And it even runs your tests for you, ensuring that for each test case your code gets exactly the data it needs.
+
+To just get up and running quickly, go have a look at the Quick Start tutorial. The reference documentation you are reading right now will take you through all important concepts and explain how to use all parts of DDT and how they work.

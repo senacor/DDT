@@ -1,0 +1,11 @@
+/build
+/dist
+/TEST-*
+.svn
+.DS_Store
+*.log
+*.aux
+*.pdfsync
+*.out
+*~
+target/

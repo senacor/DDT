@@ -1,0 +1,107 @@
+DDT Reference Manual
+
+To get up and running quickly, read the Tutorial found in under doc/tutorial. This reference documentation will
+explain all concepts and APIs in detail.
+
+
+h1. The main concepts and corresponding classes
+
+These are the concepts and classes you will encounter when you work with DDT. After a brief introduction here,
+see later sections of this manual for detailed information on all of them. 
+
+
+h2. Writing and running tests
+
+When writing and running tests, you will see and need these concepts and classes:
+
+
+h3. TestCaseData
+
+This class provides you with all the data the _current_ run of your test case needs. If you have several sets
+of data, this will be the view on exactly one of those sets. It features convenient methods to retrieve Strings,
+Dates, Numbers and arbitrary objects. The most useful method, however, is fillBean - which will take a JavaBean
+and build a whole graph of objects on top of it, saving you the effort of constructing it on your own from many
+data items.
+
+
+h3. DataDrivenTestCase
+
+This is barely more than a marker interface, but it is vital for your tests: It provides the methods DDT uses
+to inject the test data into your testcase. All tests you want to run with DDT must implement this interface.
+
+
+h3. ObjectMatrixFactories
+Although you won't see them directly when just writing tests, DDT uses abstractions called ObjectMatrix and
+StringMatrix under the hood. Basically, these are the data sources that provide your tests with the input they
+need. All you have to do is use one of the supplied factories to make one. There are several such factories,
+including ExcelObjectMatrixFactory for reading Excel workbook files. 
+
+
+h3. TestSuiteConfiguration
+Like TestCaseData, this is a facade that hides some of the implementation details of DDT. When building a test
+suite, you can programmatically set some options on a TestSuiteConfiguration instance.
+
+
+h3. TestSuiteBuilder
+The TestSuiteBuilder is where it all comes together. You pass it your ObjectMatrixFactory, your
+TestSuiteConfiguration and your test class and it will build the test suite which you can then run. Currently
+the only supplied implementation is called JUnitTestSuiteBuilder which supports JUnit3.8 tests. A JUnit4-compatible
+builder should be available soon.
+
+h2. Implementing your own data source
+If the provided readers for Excel files, property files and CSV files are not enough, you can easily provide
+your own implementations. This is what you will need:
+
+h3. StringMatrix
+StringMatrix is a simple two-dimensional matrix of (surprise!) strings. This is the basic abstraction over data
+sources in DDT, so if you can shoehorn your data into something like that, you're well on your way. 
+
+h4. DefaultStringMatrix
+Data is organized in named rows and columns. With the default implementation, these names come from the matrix
+itself, usually the very first row and column. This should be suitable for the vast majority of cases, so you
+will normally be able to use this implementation and merely provide a reader for your file format.
+
+h4. StringMatrixReader
+DefaultStringMatrix defines this interface, which simply requires a method to read one cell of the matrix by giving
+0-based coordinates as integers. There are implementations for Excel files, CSV files and property files. In most
+cases, this is what you need to implement to read your own file format.
+
+
+h1. Data-driven Testing
+
+As seen in the Tutorial, all you need for data-driven testing are a testcase and a data source, such as an Excel
+file.
+
+h2. Data Sources
+
+DDT comes with several reader implementations, allowing you to use Excel spreadsheet files as well as CSV 
+and .properties files to supply your tests with data. You can easily add custom implementations to read just
+about any file format that can be represented in what DDT calls a StringMatrix.
+
+
+To run your test with several different data sets, you put all the data belonging to one set into one single
+column of your matrix, e.g. one column in your Excel sheet. More data sets can be added simply by adding more
+columns. Some readers may allow you to transpose the matrix, i.e. putting the data sets into rows instead of
+columns, but the default is columns, and this is reflected also in the API. See JExcelStringMatrixReader Javadoc
+for more information.
+
+Each cell of the column contains one data item, which is addressed by name. Where these names come from depends 
+on the StringMatrix implementation - the default implementation (DefaultStringMatrix) reads them from the very
+first column. This is configurable, see the Javadoc for that class.
+
+A picture should make most of this clear:
+
+!testdata-example.png!
+
+When you run your test with this Excel sheet as data source, DDT will run your test methods once for each column,
+each time supplying you with the data from that column, isolating your code from the rest of the matrix.
+
+Usually when running tests you won't see much of the data sources, since the gory details are hidden inside the 
+
+Let's have a look at the most important classes:
+
+h3. DefaultStringMatrix
+
+This is the default implementation of the StringMatrix interface which takes the row names from a column in the
+data source, usually the very first one. It should be suitable for the vast majority of use cases. Data is read
+via implementations of the StringMatrixReader interface

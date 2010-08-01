@@ -1,0 +1,27 @@
+;"Col1";"Col2";"embeddedAnnotation~embedded=value";"multiEmbedded~embedded1=value1";"multiEmbedded~embedded2=value2";"perRow~perRowAnnotation=";"multiEmbeddedWithBase~embedded1=valueBase1";"multiEmbeddedWithBase";"perRowMulti~perRowAnnotation=";"perRowMulti~perRowAnnotation2=";"embeddedAndPerRow";"embeddedAndPerRow~perRowAnnotation=";"embeddedAndPerRow~perRowAnnotation2=";"embeddedAndPerRow~embedded1=value1";"embeddedAndPerRow~embedded2=value2";"multiEmbeddedWithBase~embedded2=valueBase2";"maskingTest"
+"embeddedAnnotation~embedded=value";"foo";"bar";;;;;;;;;;;;;;;
+"multiEmbedded~embedded1=value1";"quux";"baz";;;;;;;;;;;;;;;
+"multiEmbedded~embedded2=value2";"bar";"foo";;;;;;;;;;;;;;;
+"multiEmbeddedWithBase~embedded1=valueBase1";"quux";"baz";;;;;;;;;;;;;;;
+"multiEmbeddedWithBase";"bar";"foo";;;;;;;;;;;;;;;
+"multiEmbeddedWithBase~embedded2=valueBase2";"wrong";"wrong";;;;;;;;;;;;;;;
+"perColumn~perColumnAnnotation=";"I'm in Col 1";" I'm in Col 2";;;;;;;;;;;;;;;
+"perColumnMulti~perColumnAnnotation=";"I'm in Col 1";" I'm in Col 2";;;;;;;;;;;;;;;
+"perColumnMulti~perColumnAnnotation2=";"2 I'm in Col 1";"2 I'm in Col 2";;;;;;;;;;;;;;;
+"embeddedAndPerColumn~perColumnAnnotation=";"I'm in Col 1";" I'm in Col 2";;;;;;;;;;;;;;;
+"embeddedAndPerColumn~perColumnAnnotation2=";"2 I'm in Col 1";"2 I'm in Col 2";;;;;;;;;;;;;;;
+"embeddedAndPerColumn~embedded1=value1";"wrong";"wrong";;;;;;;;;;;;;;;
+"embeddedAndPerColumn~embedded2=value2";"wrong";"wrong";;;;;;;;;;;;;;;
+"embeddedAndPerColumn~withoutValue";"wrong";"wrong";;;;;;;;;;;;;;;
+"embeddedAndPerColumn";"bar";"foo";;;;;;;;;;;;;;;
+"Row1";;;"foo";"quux";"baz";"I'm in Row 1";"bar";"foo";"I'm in Row 1";"2 I'm in Row 1";"bar";"I'm in Row 1";"2 I'm in Row 1";"bar";"bar";"bar";
+"Row2";;;"bar";"bar";"foo";"I'm in Row 2";"bar";"foo";"I'm in Row 2";"2 I'm in Row 2";"bar";"I'm in Row 2";"2 I'm in Row 2";"bar";"bar";"bar";
+"cellAnnotation";"foo~cellAnnotation=value";;;;;;;;;;;;;;;;
+"cellAndEmbedded~embedded=valueEmbedded";"foo~cellAnnotation=valueCell";;;;;;;;;;;;;;;;
+"shouldBeMasked~foo=";;;;;;;;;;;;;;;;;"bar"
+"shouldNotBeMasked~foo";;;;;;;;;;;;;;;;;"baz"
+"multi.Embedded[AndValuelessNullCell]~ignore-if-null";;;;;;;;;;;;;;;;;
+"multi.Embedded[AndValuelessNullCell]~type=foo";;;;;;;;;;;;;;;;;
+"multi.Embedded[AndValueless]~ignore-if-null";;;;;;;;;;;;;;;;;
+"multi.Embedded[AndValueless]~type=foo";"bar";;;;;;;;;;;;;;;;
+"single.baseless[nullCell]~ignore-if-null";;;;;;;;;;;;;;;;;

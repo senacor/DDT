@@ -1,0 +1,6 @@
+	Col	Col2
+a.b.c.d	d	
+a.b.c.d.e	e	
+a.b.c~shortcut=	foo	bar
+${foo}.d.e.f	f	
+${bar}		

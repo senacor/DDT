@@ -1,0 +1,5 @@
+reserved;nonull;emptyInteger;nulltokenInteger;emptyBoolean;nulltokenBoolean
+bean.primitiveInt;1;;~null;1;1
+bean.objectInteger;1;;~null;1;1
+bean.primitiveBoolean;true;true;true;;~null
+bean.objectBoolean;true;true;true;;~null
